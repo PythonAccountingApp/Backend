@@ -12,12 +12,6 @@ password = "123"
 session = requests.Session()
 
 
-# 取得 CSRF token
-def get_csrf_token():
-    session.get(BASE_URL)
-    return session.cookies.get("csrftoken")
-
-
 # 記帳資料 ID
 expense_arg = "2024-11-14"
 
@@ -29,7 +23,7 @@ def test_register():
         "password": password,
         "email": "test@gmail.com",
     }
-    headers = {"X-CSRFToken": get_csrf_token()}
+    headers = {"Authorization": f"Token {token}"}
     response = session.post(register_url, json=new_user_data, headers=headers)
     if response.status_code == 201:
         print("註冊成功:", response.json())
@@ -38,14 +32,15 @@ def test_register():
 
 
 # 測試登入
-def test_login():
+def test_login(token):
     login_url = f"{BASE_URL}auth/login/"
-    headers = {"X-CSRFToken": get_csrf_token()}
     response = session.post(
-        login_url, json={"username": username, "password": password}, headers=headers
+        login_url, json={"username": username, "password": password}
     )
     if response.status_code == 200:
         print("登入成功:", response.json())
+        token = response.json()["token"]
+        return token
     else:
         print("登入失敗:", response.json())
 
@@ -71,7 +66,7 @@ def test_get_expense():
 
 
 # 測試新增記帳資料
-def test_create_expense():
+def test_create_expense(token):
     create_expense_url = f"{BASE_URL}transactions/"
     new_expense_data = {
         "transaction_type": "expense",
@@ -82,7 +77,7 @@ def test_create_expense():
         "amount": "120.50",
         "store": "麥當勞",
     }
-    headers = {"X-CSRFToken": get_csrf_token()}
+    headers = {"Authorization": f"Token {token}"}
     response = session.post(create_expense_url, json=new_expense_data, headers=headers)
     if response.status_code == 201:
         print("新增記帳資料成功:", response.json())
@@ -91,14 +86,14 @@ def test_create_expense():
 
 
 # 測試更新記帳資料
-def test_update_expense():
+def test_update_expense(token):
     update_expense_url = f"{BASE_URL}transactions/{expense_arg}/"
     updated_expense_data = {
         "description": "晚餐",
         "amount": "200.00",
         "store": "肯德基",
     }
-    headers = {"X-CSRFToken": get_csrf_token()}
+    headers = {"Authorization": f"Token {token}"}
     response = session.put(update_expense_url, json=updated_expense_data, headers=headers)
     if response.status_code == 200:
         print("更新記帳資料成功:", response.json())
@@ -107,9 +102,9 @@ def test_update_expense():
 
 
 # 測試刪除記帳資料
-def test_delete_expense():
+def test_delete_expense(token):
     delete_expense_url = f"{BASE_URL}transactions/{expense_arg}/"
-    headers = {"X-CSRFToken": get_csrf_token()}
+    headers = {"Authorization": f"Token {token}"}
     response = session.delete(delete_expense_url, headers=headers)
     if response.status_code == 204:
         print("刪除記帳資料成功")
@@ -118,9 +113,9 @@ def test_delete_expense():
 
 
 # 測試登出
-def test_logout():
+def test_logout(token):
     logout_url = f"{BASE_URL}auth/logout/"
-    headers = {"X-CSRFToken": get_csrf_token()}
+    headers = {"Authorization": f"Token {token}"}
     response = session.post(logout_url, headers=headers)
     if response.status_code == 200:
         print("登出成功:", response.json())
@@ -130,11 +125,16 @@ def test_logout():
 
 # 執行測試
 if __name__ == "__main__":
+    token = "aecfbd024c5b88dec943ed1a78816357a1bfcfba"
     # test_register()  # 測試註冊
-    test_login()  # 測試登入
-    response = session.get(f"{BASE_URL}categories/", params={"category_type": "income"})  # 取得分類資料
+    # token = test_login(token)  # 測試登入
+    response = session.get(
+        f"{BASE_URL}categories/",
+        params={"category_type": "income"},
+        headers={"Authorization": f"Token {token}"},
+    )  # 取得分類資料
     print(response.json())
     # test_create_expense()  # 測試新增記帳資料
     # test_list_expenses()  # 測試取得記帳資料
     # test_get_expense()  # 測試取得特定記帳資料
-    test_logout()  # 測試登出
+    # test_logout()  # 測試登出

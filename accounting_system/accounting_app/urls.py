@@ -2,10 +2,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("auth/register/", views.LoginSystem.register_view, name="register"),
-    path("auth/login/", views.LoginSystem.login_view, name="login"),
-    path("auth/logout/", views.LoginSystem.logout_view, name="logout"),
-    path("users/", views.LoginSystem.user_view, name="users"),
+    path(
+        "auth/register/",
+        views.LoginSystem.as_view({"post": "register_view"}),
+        name="register",
+    ),
+    path("auth/login/", views.LoginSystem.as_view({"post": "login_view"}), name="login"),
+    path("auth/logout/", views.LoginSystem.as_view({"post": "logout_view"}), name="logout"),
+    path("users/", views.LoginSystem.as_view({"get": "user_view"}), name="user-list"),
     path(
         "transactions/",
         views.TransactionListCreateView.as_view(),

@@ -3,60 +3,88 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, action
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from .models import Category, Transaction, User
 from .serializers import CategorySerializer, TransactionSerializer
 
 
 class LoginSystem(viewsets.ViewSet):
-    @api_view(["POST"])
-    def register_view(request):
+    permission_classes = [AllowAny]
+
+    @csrf_exempt
+    @action(detail=False, methods=["post"], url_path="register")
+    def register_view(self, request):
+        """用戶註冊"""
         try:
-            data = json.loads(request.body)
-            username = data.get("username")
-            password = data.get("password")
-            email = data.get("email")
-            if username in User.objects.values_list("username", flat=True):
-                return JsonResponse({"error": "帳號已存在"}, status=400)
-            if username and password and email:
-                user = User.objects.create(
-                    username=username, password=make_password(password), email=email
+            username = request.data.get("username")
+            password = request.data.get("password")
+            email = request.data.get("email")
+
+            # 檢查是否已存在該用戶
+            if User.objects.filter(username=username).exists():
+                return Response(
+                    {"error": "帳號已存在"}, status=status.HTTP_400_BAD_REQUEST
                 )
-                return JsonResponse(
-                    {"message": "註冊成功", "username": user.username}, status=201
+
+            # 檢查必要欄位
+            if not (username and password and email):
+                return Response(
+                    {"error": "缺少必要欄位"}, status=status.HTTP_400_BAD_REQUEST
                 )
-            else:
-                return JsonResponse({"error": "缺少必要欄位"}, status=400)
+
+            # 創建新用戶
+            user = User.objects.create(
+                username=username, password=make_password(password), email=email
+            )
+            return Response(
+                {"message": "註冊成功", "username": user.username},
+                status=status.HTTP_201_CREATED,
+            )
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    @api_view(["POST"])
-    def login_view(request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            return Response({"message": "登入成功"}, status=status.HTTP_200_OK)
-        elif not User.objects.filter(username=username).exists():
-            return Response({"error": "帳號不存在"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({"error": "密碼錯誤"}, status=status.HTTP_400_BAD_REQUEST)
+    @csrf_exempt
+    @action(detail=False, methods=["post"], url_path="login")
+    def login_view(self, request):
+        """用戶登入並返回 Token"""
+        serializer = AuthTokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["user"]
 
-    @api_view(["POST"])
-    def logout_view(request):
-        logout(request)
-        return Response({"message": "登出成功"}, status=status.HTTP_200_OK)
+        # 生成或取得 Token
+        token, created = Token.objects.get_or_create(user=user)
+        return Response(
+            {
+                "token": token.key,
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
 
-    @api_view(["GET"])
-    def user_view(request):
+    @action(detail=False, methods=["post"], url_path="logout")
+    def logout_view(self, request):
+        """用戶登出"""
+        if request.user.is_authenticated:
+            # 刪除用戶的 Token
+            request.user.auth_token.delete()
+            return Response({"message": "登出成功"}, status=status.HTTP_200_OK)
+        return Response({"error": "用戶未登入"}, status=status.HTTP_401_UNAUTHORIZED)
+
+    @action(detail=False, methods=["get"], url_path="users")
+    def user_view(self, request):
+        """獲取用戶列表"""
         users = User.objects.all()
         data = [{"username": user.username, "email": user.email} for user in users]
-        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
