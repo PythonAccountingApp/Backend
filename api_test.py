@@ -125,9 +125,9 @@ def test_logout(token):
 
 # 執行測試
 if __name__ == "__main__":
-    token = "aecfbd024c5b88dec943ed1a78816357a1bfcfba"
+    token = None
     # test_register()  # 測試註冊
-    # token = test_login(token)  # 測試登入
+    token = test_login(token)  # 測試登入
     response = session.get(
         f"{BASE_URL}categories/",
         params={"category_type": "income"},
