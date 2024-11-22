@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -136,10 +137,15 @@ REST_FRAMEWORK = {
     ],
 }
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "cheung950624@gmail.com"  # 您的 Gmail 地址
-EMAIL_HOST_PASSWORD = "nqkw zvdb jnhz kxwa"  # 應用專用密碼
-FRONTEND_URL = "http://localhost:8000"
+
+with open("../backend/accounting_system/config.json", "r") as f:
+    CONFIG = json.load(f)
+
+
+EMAIL_BACKEND = CONFIG['email']['backend']
+EMAIL_HOST = CONFIG['email']['host']
+EMAIL_PORT = CONFIG['email']['port']
+EMAIL_USE_TLS = CONFIG['email']['use_tls']
+EMAIL_HOST_USER = CONFIG['email']['user']
+EMAIL_HOST_PASSWORD = CONFIG['email']['password']
+FRONTEND_URL = CONFIG['email']['frontend_url']
