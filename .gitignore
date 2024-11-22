@@ -15,4 +15,4 @@ key.key
 
 token.enc
 
-config.json
+backend/accounting_system/config.json
