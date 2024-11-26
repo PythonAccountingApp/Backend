@@ -66,12 +66,17 @@ class LoginView(viewsets.ViewSet):
     def login_view(self, request):
         """用戶登入並返回 Token"""
         try:
-            if request.data.get("username"):
+            if not request.data.get("username") and not request.data.get("email"):
+                return Response(
+                    {"error": "Please enter username and password"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if not request.data.get("username"):
                 return Response(
                     {"error": "Please enter username"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            if request.data.get("password"):
+            if not request.data.get("password"):
                 return Response(
                     {"error": "Please enter password"},
                     status=status.HTTP_400_BAD_REQUEST,
