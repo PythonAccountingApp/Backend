@@ -175,6 +175,51 @@ class GithubLoginView(viewsets.ViewSet):
         )
 
 
+class GoogleLoginView(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
+    @csrf_exempt
+    @action(detail=False, methods=["post"], url_path="google")
+    def login_view(self, request):
+        token = request.data.get("access_token")
+        token_type = request.data.get("token_type")
+        if not token:
+            return JsonResponse({"error": "Token is missing"}, status=400)
+
+        if not token_type:
+            return JsonResponse({"error": "Token type is missing"}, status=400)
+
+        user_info_url = "https://openidconnect.googleapis.com/v1/userinfo"
+        headers = {"Authorization": f"Bearer {token}"}
+        response = requests.get(user_info_url, headers=headers)
+
+        if response.status_code != 200:
+            return JsonResponse({"error": "Unable to verify Google token"}, status=400)
+
+        google_user = response.json()
+        username = google_user.get("email")
+        email = google_user.get("email")
+
+        user, created = User.objects.get_or_create(
+            username=username,
+            defaults={
+                "password": make_password(settings.GOOGLE_DEFAULT_PASSWORD),
+                "email": email,
+            },
+        )
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response(
+            {
+                "token": token.key,
+                "user_id": user.id,
+                "username": user.username,
+                "email": user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class PasswordResetRequestView(View):
     def post(self, request):
