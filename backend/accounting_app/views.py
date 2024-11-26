@@ -39,13 +39,13 @@ class LoginView(viewsets.ViewSet):
             # 檢查是否已存在該用戶
             if User.objects.filter(username=username).exists():
                 return Response(
-                    {"error": "帳號已存在"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
             # 檢查必要欄位
             if not (username and password and email):
                 return Response(
-                    {"error": "缺少必要欄位"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Missing required fields"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
             # 創建新用戶
@@ -53,7 +53,7 @@ class LoginView(viewsets.ViewSet):
                 username=username, password=make_password(password), email=email
             )
             return Response(
-                {"message": "註冊成功", "username": user.username},
+                {"message": "Registration successful", "username": user.username},
                 status=status.HTTP_201_CREATED,
             )
         except Exception as e:
@@ -85,8 +85,8 @@ class LoginView(viewsets.ViewSet):
         if request.user.is_authenticated:
             # 刪除用戶的 Token
             request.user.auth_token.delete()
-            return Response({"message": "登出成功"}, status=status.HTTP_200_OK)
-        return Response({"error": "用戶未登入"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        return Response({"error": "User not logged in"}, status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=False, methods=["get"], url_path="users")
     def user_view(self, request):
@@ -105,7 +105,7 @@ class GithubLoginView(viewsets.ViewSet):
         token = request.data.get("access_token")
         token_type = request.data.get("token_type")
         if not token:
-            return JsonResponse({"error": "缺少 token"}, status=400)
+            return JsonResponse({"error": "Token is missing"}, status=400)
 
         if not token_type:
             return JsonResponse({"error": "缺少 Token Type"}, status=400)
@@ -113,12 +113,11 @@ class GithubLoginView(viewsets.ViewSet):
         user_info_url = "https://api.github.com/user"
         headers = {"Authorization": f"token {token}"}
         response = requests.get(user_info_url, headers=headers)
-
         user_email_url = "https://api.github.com/user/emails"
         email_response = requests.get(user_email_url, headers=headers)
 
         if response.status_code != 200 or email_response.status_code != 200:
-            return JsonResponse({"error": "無法驗證 GitHub token"}, status=400)
+            return JsonResponse({"error": "Unable to verify GitHub token"}, status=400)
 
         github_user = response.json()
         username = github_user.get("login")
@@ -161,7 +160,7 @@ class PasswordResetRequestView(View):
 
             # 驗證 email 是否存在
             if not email:
-                return JsonResponse({"error": "請輸入電子郵件"}, status=400)
+                return JsonResponse({"error": "Please enter an email address"}, status=400)
 
             # 查找用戶
             user = User.objects.get(email=email)
@@ -173,16 +172,16 @@ class PasswordResetRequestView(View):
 
             # 發送重置密碼郵件
             send_mail(
-                "重置您的密碼",
-                f"請點擊以下鏈接重置密碼：\n\n{reset_link}\n\n如果未請求，請忽略此郵件。",
+                "Reset Your Password",
+                f"Please click the link below to reset your password:\n\n{reset_link}\n\nIf you did not request this, please ignore this email.",
                 settings.DEFAULT_FROM_EMAIL,
                 [email],
             )
-            return JsonResponse({"message": "密碼重置郵件已發送"}, status=200)
+            return JsonResponse({"message": "Password reset email sent"}, status=200)
         except User.DoesNotExist:
-            return JsonResponse({"error": "該電子郵件未註冊"}, status=404)
+            return JsonResponse({"error": "This email is not registered"}, status=404)
         except Exception as e:
-            return JsonResponse({"error": f"後端錯誤：{str(e)}"}, status=500)
+            return JsonResponse({"error": f"Internal server error: {str(e)}"}, status=500)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -205,14 +204,14 @@ class PasswordResetView(View):
             if default_token_generator.check_token(user, token):
                 user.set_password(new_password)
                 user.save()
-                messages.success(request, "密碼重置成功！")
+                messages.success(request, "Password reset successful!")
                 return render(
                     request, "password_reset_successful.html", {"success": True}
                 )
             else:
-                messages.error(request, "無效的重置連結")
+                messages.error(request, "Invalid reset link")
         except Exception:
-            messages.error(request, "密碼重置失敗")
+            messages.error(request, "Password reset failed")
         return redirect("password_reset_request")
 
 
@@ -250,7 +249,7 @@ class CategoryGetDeleteUpdateView(APIView):
             serializer = CategorySerializer(category)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ValueError:
-            return Response({"error": "無效的 ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -268,7 +267,7 @@ class CategoryGetDeleteUpdateView(APIView):
             category.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError:
-            return Response({"error": "無效的 ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -315,7 +314,7 @@ class TransactionGetDeleteUpdateView(APIView):
             serializer = TransactionSerializer(transaction)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except ValueError:
-            return Response({"error": "無效的 ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -333,6 +332,6 @@ class TransactionGetDeleteUpdateView(APIView):
             transaction.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except ValueError:
-            return Response({"error": "無效的 ID"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Invalid ID"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
