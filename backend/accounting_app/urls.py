@@ -11,7 +11,7 @@ urlpatterns = [
     path("auth/logout/", views.LoginView.as_view({"post": "logout_view"}), name="logout"),
     path("users/", views.LoginView.as_view({"get": "user_view"}), name="user-list"),
     path("auth/github/", views.GithubLoginView.as_view({"post": "login_view"}), name="github_login"),
-    path("api/auth/password-reset/", views.PasswordResetRequestView.as_view(), name="password_reset_request"),
+    path("auth/password-reset/", views.PasswordResetRequestView.as_view(), name="password_reset_request"),
     path("password-reset/<uidb64>/<token>/", views.PasswordResetView.as_view(), name="password_reset"),
     path(
         "transactions/",
