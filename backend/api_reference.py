@@ -484,8 +484,8 @@ def delete_category(id: int) -> json:
 
 if __name__ == "__main__":
     # generate_and_save_key() #! 第一次運行時需要生成金鑰
-    register("test", "123", "test.gmail.com")
-    # token = login("test", "123")["token"]
+    # register("test", "123", "test.gmail.com")
+    response = login("", "1223")
     # save_token_encrypted(token) # 登入成功後保存 Token
     # token = load_token_encrypted() # 讀取 Token
     # get_all_users()
