@@ -54,7 +54,7 @@ class PasswordResetRequestWindow(Gtk.ApplicationWindow):
         try:
             # 發送密碼重置請求到後端
             response = requests.post(
-                "http://localhost:8000/api/auth/password-reset/",
+                "http://localhost:8000/auth/password-reset/",
                 json={"email": email}  # 注意正確使用 JSON 格式
             )
             if response.status_code == 200:
