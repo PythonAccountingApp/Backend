@@ -103,19 +103,32 @@ class GithubLoginView(viewsets.ViewSet):
     @action(detail=False, methods=["post"], url_path="github")
     def login_view(self, request):
         token = request.data.get("access_token")
+        token_type = request.data.get("token_type")
         if not token:
             return JsonResponse({"error": "缺少 token"}, status=400)
+
+        if not token_type:
+            return JsonResponse({"error": "缺少 Token Type"}, status=400)
 
         user_info_url = "https://api.github.com/user"
         headers = {"Authorization": f"token {token}"}
         response = requests.get(user_info_url, headers=headers)
 
-        if response.status_code != 200:
+        user_email_url = "https://api.github.com/user/emails"
+        email_response = requests.get(user_email_url, headers=headers)
+
+        if response.status_code != 200 or email_response.status_code != 200:
             return JsonResponse({"error": "無法驗證 GitHub token"}, status=400)
 
         github_user = response.json()
         username = github_user.get("login")
-        email = github_user.get("email", "Third-party login")
+
+        user_emails = email_response.json()
+        email = ""
+        for user_email in user_emails:
+            if user_email.get("primary") == True:
+                email = user_email.get("email")
+                break
 
         user, created = User.objects.get_or_create(
             username=username,
