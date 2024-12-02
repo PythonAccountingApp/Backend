@@ -14,7 +14,9 @@ import json
 import datetime
 from pathlib import Path
 
-with open("../config.json", "r") as f:
+with open(
+    "config.json", "r"
+) as f:
     CONFIG = json.load(f)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = CONFIG['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
