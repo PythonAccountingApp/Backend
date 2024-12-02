@@ -3,14 +3,14 @@ import datetime
 import requests
 from cryptography.fernet import Fernet
 
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
+
 # 定義 API 基本 URL
-URL = "http://127.0.0.1:8000/"
+URL = CONFIG["base_url"]
 
 # 建立 Session 以保存登入狀態
 session = requests.Session()
-
-# ! 需要 cryptography 套件
-from cryptography.fernet import Fernet
 
 
 # ! 需要 cryptography 套件
@@ -487,11 +487,11 @@ def delete_category(token: str, id: int) -> json:
 
 
 if __name__ == "__main__":
-    generate_and_save_key() #! 第一次運行時需要生成金鑰
-    register("test", "123", "test.gmail.com")
+    # generate_and_save_key()  #! 第一次運行時需要生成金鑰
+    # register("test", "123", "test.gmail.com")
     token = login("test", "123")["token"]
-    save_token_encrypted(token) # 登入成功後保存 Token
-    token = load_token_encrypted() # 讀取 Token
+    save_token_encrypted(token)  # 登入成功後保存 Token
+    token = load_token_encrypted()  # 讀取 Token
     # get_all_users(token)
     # get_all_expense(token)
     # update_expense(token, 1, "expense", 2, "晚餐", "肯德基", 299, 0)
