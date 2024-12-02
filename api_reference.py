@@ -99,11 +99,11 @@ def login(username: str, password) -> json:
 
 """
 登出
-logout() -> {message: str}
+logout(token: str) -> {message: str}
 """
 
 
-def logout() -> json:
+def logout(token: str) -> json:
     logout_url = f"{URL}auth/logout/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.post(logout_url, headers=header)  # ! need to add headers(token)
@@ -117,7 +117,7 @@ def logout() -> json:
 
 """
 取得所有使用者
-get_all_users() -> [
+get_all_users(token: str) -> [
     {
         id: int,
         username: str,
@@ -127,7 +127,7 @@ get_all_users() -> [
 """
 
 
-def get_all_users() -> json:
+def get_all_users(token: str) -> json:
     users_url = f"{URL}users/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(users_url, headers=header)  # ! need to add headers(token)
@@ -141,7 +141,7 @@ def get_all_users() -> json:
 
 """
 取得記帳資料
-get_all_expense() -> [
+get_all_expense(token: str) -> [
     {
         id: int,
         transaction_type: "expense" or "income",
@@ -158,7 +158,7 @@ get_all_expense() -> [
 """
 
 
-def get_all_expense() -> json:
+def get_all_expense(token: str) -> json:
     expense_url = f"{URL}transactions/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(expense_url, headers=header)  # ! need to add headers(token)
@@ -173,6 +173,7 @@ def get_all_expense() -> json:
 """
 取得特定記帳資料（使用 id 或 params）
 get_expense(
+    token: str,
     id: int,
     params: {category: id, start_date: date, end_date: date}
 ) -> [
@@ -192,7 +193,7 @@ get_expense(
 """
 
 
-def get_expense(id: int, params: json = None) -> json:
+def get_expense(token: str, id: int, params: json = None) -> json:
     expense_url = f"{URL}transactions/{id}/" if id else f"{URL}transactions/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(
@@ -211,6 +212,7 @@ def get_expense(id: int, params: json = None) -> json:
 """
 新增記帳資料
 create_expense(
+    token: str,
     transaction_type: str,
     category: int,
     description: str,
@@ -236,15 +238,16 @@ create_expense(
 
 
 def create_expense(
-        transaction_type: str,
-        category: int,
-        description: str,
-        store: str,
-        amount: float = 0,
-        discount: float = 0,
-        date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
-        time: str = datetime.datetime.now().strftime("%H:%M:%S"),
-        detail: str = "",
+    token: str,
+    transaction_type: str,
+    category: int,
+    description: str,
+    store: str,
+    amount: float = 0,
+    discount: float = 0,
+    date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
+    time: str = datetime.datetime.now().strftime("%H:%M:%S"),
+    detail: str = "",
 ) -> json:
     create_expense_url = f"{URL}transactions/"
     new_expense_data = {
@@ -273,6 +276,7 @@ def create_expense(
 """
 更新記帳資料
 update_expense(
+    token: str,
     transaction_type: str,
     category: int,
     description: str,
@@ -298,16 +302,17 @@ update_expense(
 
 
 def update_expense(
-        id: int,
-        transaction_type: str,
-        category: int,
-        description: str,
-        store: str,
-        amount: float = 0,
-        discount: float = 0,
-        date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
-        time: str = datetime.datetime.now().strftime("%H:%M:%S"),
-        detail: str = "",
+    token: str,
+    id: int,
+    transaction_type: str,
+    category: int,
+    description: str,
+    store: str,
+    amount: float = 0,
+    discount: float = 0,
+    date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
+    time: str = datetime.datetime.now().strftime("%H:%M:%S"),
+    detail: str = "",
 ) -> json:
     update_expense_url = f"{URL}transactions/{id}/"
     updated_expense_data = {
@@ -335,11 +340,11 @@ def update_expense(
 
 """
 刪除記帳資料
-delete_expense(id: int) -> {"message": str}
+delete_expense(token:str, id: int) -> {"message": str}
 """
 
 
-def delete_expense(id: int) -> json:
+def delete_expense(token: str, id: int) -> json:
     delete_expense_url = f"{URL}transactions/{id}/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.delete(
@@ -355,7 +360,7 @@ def delete_expense(id: int) -> json:
 
 """
 取得所有分類
-get_all_categories() -> [
+get_all_categories(token: str) -> [
     {
         id: int,
         name: str,
@@ -365,7 +370,7 @@ get_all_categories() -> [
 """
 
 
-def get_all_categories() -> json:
+def get_all_categories(token: str) -> json:
     categories_url = f"{URL}categories/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(
@@ -381,7 +386,7 @@ def get_all_categories() -> json:
 
 """
 取得特定分類
-get_category(id: int, params: {"category_type": "expense" or "income"}) -> [
+get_category(token:str, id: int, params: {"category_type": "expense" or "income"}) -> [
     {
         id: int,
         name: str,
@@ -391,7 +396,7 @@ get_category(id: int, params: {"category_type": "expense" or "income"}) -> [
 """
 
 
-def get_category(id: int = None, params: json = None) -> json:
+def get_category(token: str, id: int = None, params: json = None) -> json:
     category_url = f"{URL}categories/{id}/" if id else f"{URL}categories/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(
@@ -407,7 +412,7 @@ def get_category(id: int = None, params: json = None) -> json:
 
 """
 新增分類
-create_category(name: str, category_type: str) -> {
+create_category(token:str, name: str, category_type: str) -> {
     id: int,
     name: str,
     category_type: "expense" or "income",
@@ -415,7 +420,7 @@ create_category(name: str, category_type: str) -> {
 """
 
 
-def create_category(name: str, category_type: str) -> json:
+def create_category(token: str, name: str, category_type: str) -> json:
     create_category_url = f"{URL}categories/"
     new_category_data = {
         "name": name,
@@ -435,7 +440,7 @@ def create_category(name: str, category_type: str) -> json:
 
 """
 更新分類
-update_category(id: int, name: str, category_type: str) -> {
+update_category(token:str, id: int, name: str, category_type: str) -> {
     id: int,
     name: str,
     category_type: "expense" or "income",
@@ -443,7 +448,7 @@ update_category(id: int, name: str, category_type: str) -> {
 """
 
 
-def update_category(id: int, name: str, category_type: str) -> json:
+def update_category(token: str, id: int, name: str, category_type: str) -> json:
     update_category_url = f"{URL}categories/{id}/"
     updated_category_data = {
         "name": name,
@@ -463,11 +468,11 @@ def update_category(id: int, name: str, category_type: str) -> json:
 
 """
 刪除分類
-delete_category(id: int) -> {"message": str}
+delete_category(token: str, id: int) -> {"message": str}
 """
 
 
-def delete_category(id: int) -> json:
+def delete_category(token: str, id: int) -> json:
     delete_category_url = f"{URL}categories/{id}/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.delete(
@@ -482,24 +487,24 @@ def delete_category(id: int) -> json:
 
 
 if __name__ == "__main__":
-    # generate_and_save_key() #! 第一次運行時需要生成金鑰
-    # register("test", "123", "test.gmail.com")
-    response = login("", "1223")
-    # save_token_encrypted(token) # 登入成功後保存 Token
-    # token = load_token_encrypted() # 讀取 Token
-    # get_all_users()
-    # get_all_expense()
-    # update_expense(1, "expense", 2, "晚餐", "肯德基", 299, 0)
-    # get_expense(15)
+    generate_and_save_key() #! 第一次運行時需要生成金鑰
+    register("test", "123", "test.gmail.com")
+    token = login("test", "123")["token"]
+    save_token_encrypted(token) # 登入成功後保存 Token
+    token = load_token_encrypted() # 讀取 Token
+    # get_all_users(token)
+    # get_all_expense(token)
+    # update_expense(token, 1, "expense", 2, "晚餐", "肯德基", 299, 0)
+    # get_expense(token, 15)
     # get_expense(
-    #     None, {"category": 1, "start_date": "2021-01-01", "end_date": "2021-12-31"}
+    #     token, None, {"category": 1, "start_date": "2021-01-01", "end_date": "2021-12-31"}
     # )
-    # create_expense("expense", 1, "午餐", "麥當勞", 100, 0)
-    # delete_expense(14)
-    # get_all_categories()
-    # get_category(1)
-    # get_category(None, {"category_type": "income"})
-    # create_category("測試", "income")
-    # update_category(24, "測試", "expense")
-    # delete_category(24)
-    # logout()
+    # create_expense(token, "expense", 1, "午餐", "麥當勞", 100, 0)
+    # delete_expense(token, 14)
+    # get_all_categories(token)
+    # get_category(token, 1)
+    # get_category(token, None, {"category_type": "income"})
+    # create_category(token, "測試", "income")
+    # update_category(token, 24, "測試", "expense")
+    # delete_category(token, 24)
+    logout(token)
