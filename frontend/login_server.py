@@ -30,5 +30,3 @@ class GithubLoginServer:
     def GithubLoginServerStart(self):
         print("Server Start")
         self.serverThread.start()
-
-# 2f56277d2ac07844952f
