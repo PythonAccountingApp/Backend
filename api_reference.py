@@ -9,12 +9,11 @@ URL = "http://127.0.0.1:8000/"
 # 建立 Session 以保存登入狀態
 session = requests.Session()
 
-
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 from cryptography.fernet import Fernet
 
 
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 # 第一次使用時，生成加密金鑰並保存
 def generate_and_save_key():
     key = Fernet.generate_key()
@@ -22,21 +21,21 @@ def generate_and_save_key():
         key_file.write(key)
 
 
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 # 加載加密金鑰
 def load_key():
     with open("key.key", "rb") as key_file:
         return key_file.read()
 
 
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 # 初始化加密器
 def initialize_cipher():
     key = load_key()
     return Fernet(key)
 
 
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 # 保存加密的 Token
 def save_token_encrypted(token: str):
     cipher = initialize_cipher()  # 初始化加密器
@@ -45,7 +44,7 @@ def save_token_encrypted(token: str):
         file.write(encrypted_token)
 
 
-#! 需要 cryptography 套件
+# ! 需要 cryptography 套件
 # 讀取並解密 Token
 def load_token_encrypted() -> str:
     try:
@@ -107,7 +106,7 @@ logout() -> {message: str}
 def logout() -> json:
     logout_url = f"{URL}auth/logout/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
-    response = session.post(logout_url, headers=header)  #! need to add headers(token)
+    response = session.post(logout_url, headers=header)  # ! need to add headers(token)
     if response.status_code == 200:
         print("登出成功:", response.json())
         return response.json()
@@ -131,7 +130,7 @@ get_all_users() -> [
 def get_all_users() -> json:
     users_url = f"{URL}users/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
-    response = session.get(users_url, headers=header)  #! need to add headers(token)
+    response = session.get(users_url, headers=header)  # ! need to add headers(token)
     if response.status_code == 200:
         print("取得所有使用者成功:", response.json())
         return response.json()
@@ -162,7 +161,7 @@ get_all_expense() -> [
 def get_all_expense() -> json:
     expense_url = f"{URL}transactions/"
     header = {"Authorization": f"Token {token}"}  # token is from login()
-    response = session.get(expense_url, headers=header)  #! need to add headers(token)
+    response = session.get(expense_url, headers=header)  # ! need to add headers(token)
     if response.status_code == 200:
         print("取得記帳資料成功:", response.json())
         return response.json()
@@ -200,7 +199,7 @@ def get_expense(id: int, params: json = None) -> json:
         expense_url,
         params=params,
         headers=header,
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 200:
         print("取得特定記帳資料成功:", response.json())
         return response.json()
@@ -237,15 +236,15 @@ create_expense(
 
 
 def create_expense(
-    transaction_type: str,
-    category: int,
-    description: str,
-    store: str,
-    amount: float = 0,
-    discount: float = 0,
-    date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
-    time: str = datetime.datetime.now().strftime("%H:%M:%S"),
-    detail: str = "",
+        transaction_type: str,
+        category: int,
+        description: str,
+        store: str,
+        amount: float = 0,
+        discount: float = 0,
+        date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
+        time: str = datetime.datetime.now().strftime("%H:%M:%S"),
+        detail: str = "",
 ) -> json:
     create_expense_url = f"{URL}transactions/"
     new_expense_data = {
@@ -262,7 +261,7 @@ def create_expense(
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.post(
         create_expense_url, json=new_expense_data, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 201:
         print("新增記帳資料成功:", response.json())
         return response.json()
@@ -299,16 +298,16 @@ update_expense(
 
 
 def update_expense(
-    id: int,
-    transaction_type: str,
-    category: int,
-    description: str,
-    store: str,
-    amount: float = 0,
-    discount: float = 0,
-    date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
-    time: str = datetime.datetime.now().strftime("%H:%M:%S"),
-    detail: str = "",
+        id: int,
+        transaction_type: str,
+        category: int,
+        description: str,
+        store: str,
+        amount: float = 0,
+        discount: float = 0,
+        date: str = datetime.datetime.now().strftime("%Y-%m-%d"),
+        time: str = datetime.datetime.now().strftime("%H:%M:%S"),
+        detail: str = "",
 ) -> json:
     update_expense_url = f"{URL}transactions/{id}/"
     updated_expense_data = {
@@ -325,7 +324,7 @@ def update_expense(
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.put(
         update_expense_url, json=updated_expense_data, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 200:
         print("更新記帳資料成功:", response.json())
         return response.json()
@@ -345,7 +344,7 @@ def delete_expense(id: int) -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.delete(
         delete_expense_url, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 204:
         print("刪除記帳資料成功")
         return {"message": "刪除記帳資料成功"}
@@ -371,7 +370,7 @@ def get_all_categories() -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(
         categories_url, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 200:
         print("取得所有分類成功:", response.json())
         return response.json()
@@ -397,7 +396,7 @@ def get_category(id: int = None, params: json = None) -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.get(
         category_url, params=params, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 200:
         print("取得特定分類成功:", response.json())
         return response.json()
@@ -425,7 +424,7 @@ def create_category(name: str, category_type: str) -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.post(
         create_category_url, json=new_category_data, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 201:
         print("新增分類成功:", response.json())
         return response.json()
@@ -453,7 +452,7 @@ def update_category(id: int, name: str, category_type: str) -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.put(
         update_category_url, json=updated_category_data, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 200:
         print("更新分類成功:", response.json())
         return response.json()
@@ -473,7 +472,7 @@ def delete_category(id: int) -> json:
     header = {"Authorization": f"Token {token}"}  # token is from login()
     response = session.delete(
         delete_category_url, headers=header
-    )  #! need to add headers(token)
+    )  # ! need to add headers(token)
     if response.status_code == 204:
         print("刪除分類成功")
         return {"message": "刪除分類成功"}
