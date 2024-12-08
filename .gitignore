@@ -23,4 +23,5 @@ config.json
 venv
 
 frontend/.env
-frontend/.env
+
+collected_static
