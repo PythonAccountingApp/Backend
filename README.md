@@ -1,6 +1,7 @@
+
 # Accounting App Backend
 
-A backend application for an Accounting App built with Python.
+A backend application for an Accounting App built with Python and Django, containerized using Docker.
 
 ## Prerequisites
 
@@ -14,23 +15,93 @@ Ensure the following are installed on your computer:
 
 Follow these steps to set up and run the application:
 
-1. Install `docker-compose`:
+### Step 1: Create `config.json`
+In the root directory, create a file named `config.json` with the following content:
 
- ```bash
- pip install docker-compose
- ```
+```json
+{
+  "base_url": "your-site-url-here, e.g., http://localhost:8000/",
+  "secret_key": "your-django-secret-key",
+  "github": {
+    "default_password": "your-default-password"
+  },
+  "google": {
+    "default_password": "your-default-password"
+  },
+  "email": {
+    "backend": "django.core.mail.backends.smtp.EmailBackend",
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "use_tls": true,
+    "user": "your-email-address",
+    "password": "your-email-password"
+  }
+}
+```
 
-2. Build the Docker images:
+Replace placeholders (`your-site-url-here`, `your-django-secret-key`, etc.) with the actual values.
 
- ```bash
- docker compose build
- ```
+---
 
-3. Start the application:
+### Step 2: Modify `config/nginx`
+Update the `config/nginx` file with the following configuration:
 
- ```bash
- docker compose up
- ```
+```conf
+upstream app {
+  ip_hash;
+  server app:8000;
+}
+
+server {
+  listen 8000;
+  server_name your-site-url-here;
+
+  location /static/ {
+    autoindex on;
+    alias /code/collected_static/;
+  }
+
+  location / {
+    proxy_pass http://app/;
+  }
+}
+```
+
+Replace `your-site-url-here` with your actual site URL.
+
+---
+
+### Step 3: Install `docker-compose`
+Install Docker Compose using the following command:
+
+```bash
+pip install docker-compose
+```
+
+---
+
+### Step 4: Build the Docker Images
+Build the Docker images by running:
+
+```bash
+docker compose build
+```
+
+---
+
+### Step 5: Start the Application
+Start the application by running:
+
+```bash
+docker compose up
+```
+
+---
+
+### Step 6: Expose the Application
+Expose the application to the internet using a static IP address or a Cloudflare Tunnel.
+
+---
 
 ## Project Structure
 
@@ -62,7 +133,11 @@ Backend
 └── manage.py              # Django management script
 ```
 
+---
+
 ## Notes
 
 - The application is configured to run on port 8000 by default.
-- For any issues or contributions, feel free to create an issue or a pull request.
+- For any issues or contributions, feel free to create an issue or submit a pull request on the project repository.
+
+---
