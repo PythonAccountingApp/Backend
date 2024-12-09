@@ -7,19 +7,7 @@ services:
       - .:/code
       - static-volume:/code/collected_static
     ports:
-      - "8000"
-    networks:
-      - web_network
-  nginx:
-    restart: always
-    image: nginx:latest
-    ports:
       - "8000:8000"
-    volumes:
-      - static-volume:/code/collected_static
-      - ./config/nginx:/etc/nginx/conf.d
-    depends_on:
-      - app
     networks:
       - web_network
 
