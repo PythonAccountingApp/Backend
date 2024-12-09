@@ -101,8 +101,6 @@ docker compose up
 ### Step 6: Expose the Application
 Expose the application to the internet using a static IP address or a Cloudflare Tunnel.
 
----
-
 ## Project Structure
 
 The project is structured as follows:
@@ -133,11 +131,8 @@ Backend
 └── manage.py              # Django management script
 ```
 
----
-
 ## Notes
 
 - The application is configured to run on port 8000 by default.
 - For any issues or contributions, feel free to create an issue or submit a pull request on the project repository.
 
----
