@@ -30,7 +30,7 @@ SECRET_KEY = CONFIG["secret_key"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["app"]
+ALLOWED_HOSTS = ["api.actcfx.net"]
 
 # Application definition
 

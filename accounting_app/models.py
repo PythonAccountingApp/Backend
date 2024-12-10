@@ -32,8 +32,8 @@ class Transaction(models.Model):
     discount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     description = models.CharField(max_length=255, blank=True)
     store = models.CharField(max_length=255, blank=True, null=True)
-    date = models.DateField(default=timezone.localdate)
-    time = models.TimeField(default=timezone.localtime)
+    date = models.DateField(default=timezone.localdate, blank=True, null=True)
+    time = models.TimeField(default=timezone.localtime, blank=True, null=True)
     detail = models.TextField(blank=True, null=True)
 
     def __str__(self):
