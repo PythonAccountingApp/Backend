@@ -28,13 +28,13 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=7, choices=TRANSACTION_TYPE_CHOICES)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=20, decimal_places=2)
-    discount = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    description = models.CharField(max_length=255, blank=True)
-    store = models.CharField(max_length=255, blank=True, null=True)
+    amount = models.DecimalField(default=0, max_digits=20, decimal_places=2)
+    discount = models.DecimalField(default=0, max_digits=20, decimal_places=2, blank=True)
+    description = models.CharField(default="", max_length=255, blank=True)
+    store = models.CharField(default="", max_length=255, blank=True, null=True)
     date = models.DateField(default=timezone.localdate, blank=True, null=True)
     time = models.TimeField(default=timezone.localtime, blank=True, null=True)
-    detail = models.TextField(blank=True, null=True)
+    detail = models.TextField(default="", blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.description} - {self.amount} on {self.date}"
