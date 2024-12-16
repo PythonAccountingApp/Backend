@@ -43,6 +43,12 @@ class LoginView(viewsets.ViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
+            # 檢查郵箱是否已被使用
+            if User.objects.filter(email=email).exists():
+                return Response(
+                    {"error": "Email already be used"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
             # 檢查必要欄位
             if not (username and password and email):
                 return Response(
