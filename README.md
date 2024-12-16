@@ -43,35 +43,7 @@ Replace placeholders (`your-site-url-here`, `your-django-secret-key`, etc.) with
 
 ---
 
-### Step 2: Modify `config/nginx`
-Update the `config/nginx` file with the following configuration:
-
-```conf
-upstream app {
-  ip_hash;
-  server app:8000;
-}
-
-server {
-  listen 8000;
-  server_name your-site-url-here;
-
-  location /static/ {
-    autoindex on;
-    alias /code/collected_static/;
-  }
-
-  location / {
-    proxy_pass http://app/;
-  }
-}
-```
-
-Replace `your-site-url-here` with your actual site URL.
-
----
-
-### Step 3: Install `docker-compose`
+### Step 2: Install `docker-compose`
 Install Docker Compose using the following command:
 
 ```bash
@@ -80,7 +52,7 @@ pip install docker-compose
 
 ---
 
-### Step 4: Build the Docker Images
+### Step 3: Build the Docker Images
 Build the Docker images by running:
 
 ```bash
