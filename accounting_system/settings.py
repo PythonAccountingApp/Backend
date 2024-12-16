@@ -143,7 +143,7 @@ EMAIL_PORT = CONFIG["email"]["port"]
 EMAIL_USE_TLS = CONFIG["email"]["use_tls"]
 EMAIL_HOST_USER = CONFIG["email"]["user"]
 EMAIL_HOST_PASSWORD = CONFIG["email"]["password"]
-RESET_PASSWORD_URL = CONFIG["base_url"] + "/password-reset/"
+RESET_PASSWORD_URL = CONFIG["base_url"] + "password-reset"
 GITHUB_DEFAULT_PASSWORD = CONFIG["github"][
     "default_password"
 ] + datetime.datetime.now().strftime("%Y/%m/%d_%H:%M:%S")
